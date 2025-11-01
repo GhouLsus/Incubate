@@ -16,6 +16,11 @@ const Navbar = () => {
           <Link href="/" className="text-slate-600 hover:text-slate-900">
             Browse
           </Link>
+          {isAuthenticated && (
+            <Link href="/dashboard" className="text-slate-600 hover:text-slate-900">
+              Dashboard
+            </Link>
+          )}
           {isAdmin && (
             <Link href="/admin/sweets" className="text-slate-600 hover:text-slate-900">
               Admin

@@ -2,39 +2,47 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 import { useAuth } from "../hooks/useAuth";
 
 const LoginPage: NextPage = () => {
   const router = useRouter();
   const { login, isAuthenticated } = useAuth();
-  const [form, setForm] = useState({ email: "", password: "" });
+
+  const loginSchema = z.object({
+    email: z.string().email("Please enter a valid email"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+  });
+
+  type LoginFormValues = z.infer<typeof loginSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
 
   const loginMutation = useMutation({
-    mutationFn: () => login(form),
+    mutationFn: (values: LoginFormValues) => login(values),
     onSuccess: () => {
-      const redirect = (router.query.from as string) ?? "/";
+      const redirect = (router.query.from as string) ?? "/dashboard";
       router.replace(redirect).catch(console.error);
     }
   });
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/").catch(console.error);
+      router.replace("/dashboard").catch(console.error);
     }
   }, [isAuthenticated, router]);
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    loginMutation.mutate();
-  };
 
   return (
     <>
@@ -45,7 +53,7 @@ const LoginPage: NextPage = () => {
         <h1 className="text-2xl font-semibold text-slate-900">Welcome back</h1>
         <p className="mt-2 text-sm text-slate-500">Log in to manage your sweet adventures.</p>
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit((values) => loginMutation.mutate(values))}>
           <div>
             <label className="block text-sm font-medium text-slate-700" htmlFor="email">
               Email
@@ -55,10 +63,10 @@ const LoginPage: NextPage = () => {
               name="email"
               type="email"
               required
-              value={form.email}
-              onChange={handleChange}
+              {...register("email")}
               className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
             />
+            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700" htmlFor="password">
@@ -69,10 +77,10 @@ const LoginPage: NextPage = () => {
               name="password"
               type="password"
               required
-              value={form.password}
-              onChange={handleChange}
+              {...register("password")}
               className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
             />
+            {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
           </div>
           <button
             type="submit"
