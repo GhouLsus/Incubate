@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Head from "next/head";
 import clsx from "clsx";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./Navbar";
 
 interface LayoutProps {
@@ -20,6 +21,7 @@ const Layout = ({ title, className, children }: LayoutProps) => {
       </Head>
       <div className="min-h-screen">
         <Navbar />
+        <Toaster position="top-right" />
         <main className={clsx("mx-auto w-full max-w-6xl px-4 py-10", className)}>{children}</main>
       </div>
     </>

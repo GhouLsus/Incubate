@@ -2,39 +2,76 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
 
 import ProtectedRoute from "../../components/ProtectedRoute";
 import SweetForm from "../../components/SweetForm";
+import Modal from "../../components/Modal";
 import { createSweet, deleteSweet, fetchSweets, restockSweet, updateSweet } from "../../api/sweets";
 import type { Sweet, SweetInput } from "../../types/sweet";
 
 const AdminSweetsPage: NextPage = () => {
   const queryClient = useQueryClient();
   const [editingSweet, setEditingSweet] = useState<Sweet | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const sweetsQuery = useQuery({ queryKey: ["sweets"], queryFn: fetchSweets });
 
+  const getErrorMessage = (error: unknown) => {
+    if (error instanceof AxiosError) {
+      return error.response?.data?.detail ?? error.message;
+    }
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return "Something went wrong";
+  };
+
   const createMutation = useMutation({
     mutationFn: (values: SweetInput) => createSweet(values),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sweets"] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sweets"] });
+      toast.success("Sweet created successfully");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string; values: SweetInput }) => updateSweet(id, values),
     onSuccess: () => {
       setEditingSweet(null);
+      setIsEditModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["sweets"] });
-    }
+      toast.success("Sweet updated successfully");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
   });
 
   const restockMutation = useMutation({
     mutationFn: ({ id, quantity }: { id: string; quantity: number }) => restockSweet(id, quantity),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sweets"] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sweets"] });
+      toast.success("Stock updated");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteSweet(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sweets"] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sweets"] });
+      toast.success("Sweet deleted");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
   });
 
   const handleCreate = async (values: SweetInput) => {
@@ -44,6 +81,11 @@ const AdminSweetsPage: NextPage = () => {
   const handleUpdate = async (values: SweetInput) => {
     if (!editingSweet) return;
     await updateMutation.mutateAsync({ id: editingSweet.id, values });
+  };
+
+  const handleEdit = (sweet: Sweet) => {
+    setEditingSweet(sweet);
+    setIsEditModalOpen(true);
   };
 
   const handleRestock = (id: string) => {
@@ -70,26 +112,6 @@ const AdminSweetsPage: NextPage = () => {
           <h2 className="text-xl font-semibold text-slate-900">Add New Sweet</h2>
           <SweetForm onSubmit={handleCreate} submitLabel={createMutation.isPending ? "Creating..." : "Create sweet"} />
         </section>
-
-        {editingSweet && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-slate-900">Edit Sweet: {editingSweet.name}</h2>
-              <button
-                type="button"
-                onClick={() => setEditingSweet(null)}
-                className="rounded-md border border-slate-200 px-3 py-1 text-sm text-slate-600 hover:bg-slate-100"
-              >
-                Cancel
-              </button>
-            </div>
-            <SweetForm
-              initialValues={editingSweet}
-              onSubmit={handleUpdate}
-              submitLabel={updateMutation.isPending ? "Updating..." : "Update sweet"}
-            />
-          </section>
-        )}
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-900">Current Inventory</h2>
@@ -130,7 +152,7 @@ const AdminSweetsPage: NextPage = () => {
                         <div className="flex flex-wrap items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => setEditingSweet(sweet)}
+                            onClick={() => handleEdit(sweet)}
                             className="rounded-md border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100"
                           >
                             Edit
@@ -163,6 +185,22 @@ const AdminSweetsPage: NextPage = () => {
           )}
         </section>
       </div>
+      <Modal
+        title={editingSweet ? `Edit Sweet: ${editingSweet.name}` : "Edit Sweet"}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setEditingSweet(null);
+          setIsEditModalOpen(false);
+        }}
+      >
+        {editingSweet && (
+          <SweetForm
+            initialValues={editingSweet}
+            onSubmit={handleUpdate}
+            submitLabel={updateMutation.isPending ? "Updating..." : "Update sweet"}
+          />
+        )}
+      </Modal>
     </ProtectedRoute>
   );
 };
