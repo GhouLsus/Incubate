@@ -1,6 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import SweetCard from "../components/SweetCard";
@@ -10,6 +11,7 @@ import type { Sweet } from "../types/sweet";
 
 const HomePage: NextPage = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [filters, setFilters] = useState({ name: "", category: "" });
 
@@ -39,7 +41,12 @@ const HomePage: NextPage = () => {
   });
 
   const handlePurchase = (id: string) => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      router
+        .push({ pathname: "/login", query: { from: router.asPath } })
+        .catch((error) => console.error("Redirect to login failed", error));
+      return;
+    }
     purchaseMutation.mutate(id);
   };
 
@@ -96,7 +103,7 @@ const HomePage: NextPage = () => {
               <SweetCard
                 key={sweet.id}
                 sweet={sweet}
-                onPurchase={isAuthenticated ? handlePurchase : undefined}
+                onPurchase={handlePurchase}
                 purchaseDisabled={purchaseMutation.isPending}
               />
             ))}

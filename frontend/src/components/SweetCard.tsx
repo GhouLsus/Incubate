@@ -2,7 +2,7 @@ import type { Sweet } from "../types/sweet";
 
 interface SweetCardProps {
   sweet: Sweet;
-  onPurchase?: (id: string) => void;
+  onPurchase: (id: string) => void;
   purchaseDisabled?: boolean;
 }
 
@@ -20,16 +20,14 @@ const SweetCard = ({ sweet, onPurchase, purchaseDisabled }: SweetCardProps) => {
         <span className="text-lg font-semibold text-slate-900">${sweet.price.toFixed(2)}</span>
         <span className="text-sm text-slate-500">Stock: {sweet.quantity}</span>
       </div>
-      {onPurchase && (
-        <button
-          type="button"
-          onClick={() => onPurchase(sweet.id)}
-          disabled={purchaseDisabled || sweet.quantity < 1}
-          className="mt-4 rounded-md bg-purple-600 px-3 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-purple-300"
-        >
-          {sweet.quantity > 0 ? "Purchase" : "Out of stock"}
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={() => onPurchase(sweet.id)}
+        disabled={purchaseDisabled || sweet.quantity < 1}
+        className="mt-4 rounded-md bg-purple-600 px-3 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-purple-300"
+      >
+        {sweet.quantity > 0 ? "Purchase" : "Out of stock"}
+      </button>
     </div>
   );
 };
