@@ -67,6 +67,25 @@ class SweetService:
         self.db.delete(sweet)
         self.db.commit()
 
+    def purchase(self, sweet_id: str) -> Sweet:
+        sweet = self._get_or_404(sweet_id)
+        if sweet.quantity < 1:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Sweet is out of stock")
+
+        sweet.quantity -= 1
+        self.db.add(sweet)
+        self.db.commit()
+        self.db.refresh(sweet)
+        return sweet
+
+    def restock(self, sweet_id: str, quantity: int) -> Sweet:
+        sweet = self._get_or_404(sweet_id)
+        sweet.quantity += quantity
+        self.db.add(sweet)
+        self.db.commit()
+        self.db.refresh(sweet)
+        return sweet
+
     def _get_or_404(self, sweet_id: str) -> Sweet:
         sweet = self.db.get(Sweet, sweet_id)
         if sweet is None:

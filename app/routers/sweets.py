@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query, Response, status
 
-from app.core.security import get_current_admin
-from app.schemas.sweet import SweetCreate, SweetRead, SweetUpdate
+from app.core.security import get_current_admin, get_current_user
+from app.schemas.sweet import SweetCreate, SweetRead, SweetRestockRequest, SweetUpdate
 from app.services.sweet_service import SweetService, get_sweet_service
 
 
@@ -74,3 +74,30 @@ def delete_sweet(
 ) -> Response:
     service.delete(sweet_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/{sweet_id}/purchase",
+    response_model=SweetRead,
+    dependencies=[Depends(get_current_user)],
+)
+def purchase_sweet(
+    sweet_id: str,
+    service: SweetService = Depends(get_sweet_service),
+) -> SweetRead:
+    sweet = service.purchase(sweet_id)
+    return SweetRead.model_validate(sweet, from_attributes=True)
+
+
+@router.post(
+    "/{sweet_id}/restock",
+    response_model=SweetRead,
+    dependencies=[Depends(get_current_admin)],
+)
+def restock_sweet(
+    sweet_id: str,
+    payload: SweetRestockRequest,
+    service: SweetService = Depends(get_sweet_service),
+) -> SweetRead:
+    sweet = service.restock(sweet_id, payload.quantity)
+    return SweetRead.model_validate(sweet, from_attributes=True)

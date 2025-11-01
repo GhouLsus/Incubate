@@ -34,3 +34,7 @@ class SweetRead(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class SweetRestockRequest(BaseModel):
+    quantity: conint(gt=0)  # type: ignore[type-arg]
