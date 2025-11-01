@@ -1,8 +1,14 @@
 from fastapi import FastAPI
 
+from app.core.config import get_settings
+from app.routers import auth
+
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Sweet Shop Management System API")
+    settings = get_settings()
+    app = FastAPI(title=settings.app_name)
+
+    app.include_router(auth.router)
 
     return app
 
