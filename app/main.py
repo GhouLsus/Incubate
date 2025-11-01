@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.core.config import get_settings
-from app.routers import auth
+from app.routers import auth, sweets
 
 
 def create_app() -> FastAPI:
@@ -9,6 +9,7 @@ def create_app() -> FastAPI:
     app = FastAPI(title=settings.app_name)
 
     app.include_router(auth.router)
+    app.include_router(sweets.router)
 
     return app
 
