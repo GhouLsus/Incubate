@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/sweet_shop"
+    database_url: str = "sqlite:///./sweet_shop.db"
     jwt_secret_key: str = "super-secret-access-key"
     jwt_algorithm: str = "HS256"
     access_token_expires_minutes: int = 15
@@ -29,5 +29,5 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     return Settings()
 
-settings = Settings()
+settings = get_settings()
 
