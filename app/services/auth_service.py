@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy.orm import Session
 
@@ -6,6 +7,9 @@ from app.core.database import get_db
 from app.models.user import User
 from app.schemas.auth import TokenData, TokenResponse
 from app.utils.security import create_access_token, decode_token, hash_password, verify_password
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 class AuthService:
@@ -40,10 +44,10 @@ class AuthService:
             )
 
         access_token = create_access_token(subject=user.email)
-        return TokenResponse(access_token=access_token)
+        return TokenResponse(access_token=access_token, user=user)
 
     @staticmethod
-    def get_current_user(token: str, db: Session = Depends(get_db)) -> User:
+    def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -71,8 +75,10 @@ class AuthService:
         return user
 
     @staticmethod
-    def get_current_admin_user(token: str, db: Session = Depends(get_db)) -> User:
-        user = AuthService.get_current_user(token, db)
+    def get_current_admin_user(
+        current_user: User = Depends(get_current_user),
+    ) -> User:
+        user = current_user
         if user.role != "admin":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
