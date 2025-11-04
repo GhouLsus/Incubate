@@ -1,0 +1,18 @@
+/* Use tailwind v4 import */
+@import "tailwindcss";
+
+/* tiny global styles */
+:root {
+  --glass: rgba(255,255,255,0.55);
+}
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(16,24,40,0.08);
+}
