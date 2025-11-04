@@ -1,10 +1,16 @@
 from fastapi import FastAPI
-from app.routers import auth, sweets
+
 from app.core.config import get_settings
 from app.core.database import engine
+from app.models import sweet, user  # noqa: F401 - ensure models are imported
+from app.models.base import Base
+from app.routers import auth, sweets
 
 
 settings = get_settings()
+
+
+Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(title=settings.app_name)
