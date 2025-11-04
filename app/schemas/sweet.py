@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, conint
 
 
 class SweetCreate(BaseModel):
@@ -12,6 +12,8 @@ class SweetCreate(BaseModel):
 class SweetRead(SweetCreate):
     id: int
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class SweetUpdate(BaseModel):
     name: str | None = None
@@ -19,3 +21,7 @@ class SweetUpdate(BaseModel):
     description: str | None = None
     price: float | None = None
     quantity: int | None = None
+
+
+class SweetRestock(BaseModel):
+    quantity: conint(gt=0)

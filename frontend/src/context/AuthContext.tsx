@@ -48,8 +48,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (payload: { name?: string; email: string; password: string }) => {
     setLoading(true);
     try {
-      await registerApi(payload);
-      // optionally auto-login
+      await registerApi({
+        email: payload.email,
+        password: payload.password,
+        full_name: payload.name?.trim() ? payload.name : undefined,
+      });
       await login(payload.email, payload.password);
     } finally {
       setLoading(false);

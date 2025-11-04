@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
-from app.models.sweet import Sweet
 from fastapi import HTTPException, status
+
+from app.models.sweet import Sweet
 
 
 class SweetService:
@@ -18,6 +19,17 @@ class SweetService:
 
     def list(self):
         return self.db.query(Sweet).order_by(Sweet.created_at.asc()).all()
+
+
+    def search(self, name: str | None = None, category: str | None = None):
+        query = self.db.query(Sweet)
+        if name:
+            pattern = f"%{name}%"
+            query = query.filter(Sweet.name.ilike(pattern))
+        if category:
+            pattern = f"%{category}%"
+            query = query.filter(Sweet.category.ilike(pattern))
+        return query.order_by(Sweet.created_at.asc()).all()
 
 
     def get(self, sweet_id: int):
