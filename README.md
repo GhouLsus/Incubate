@@ -127,17 +127,22 @@ Admins can add, delete, and restock sweets.
 
 Simple yet beautiful login interface with gradients.
 
+## 💡 API Endpoints Summary
 
-💡 API Endpoints Summary
-| Method |	Endpoint	| Description	Access|
-|----------|-------------|
-|POST	| /api/auth/register	| Register a new user	Public |
-|POST	| /api/auth/login	| Login and get token	Public |
-|GET	| /api/sweets/	| Get all sweets	Authenticated |
-|POST	| /api/sweets/	| Add new sweet	Admin |
-|POST	| /api/sweets/restock	| Restock a sweet	Admin |
-|POST	| /api/sweets/purchase	| Purchase a sweet	User |
-|DELETE	| /api/sweets/{id}	| Delete a sweet	Admin |
+| Method | Endpoint | Description | Access |
+|---------|-----------|-------------|--------|
+| **POST** | `/api/auth/register` | Register a new user | Public |
+| **POST** | `/api/auth/login` | Login and get token | Public |
+| **GET** | `/api/sweets/` | Get all sweets | Authenticated |
+| **POST** | `/api/sweets/` | Add new sweet | Admin |
+| **POST** | `/api/sweets/restock` | Restock a sweet | Admin |
+| **POST** | `/api/sweets/purchase` | Purchase a sweet | User |
+| **DELETE** | `/api/sweets/{id}` | Delete a sweet | Admin |
+
+---
+
+## 🤖 My AI Usage
+
 
 🤖 My AI Usage
 🧩 Tools Used
