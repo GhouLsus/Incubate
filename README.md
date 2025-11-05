@@ -87,6 +87,8 @@ uvicorn app.main:app --reload
 The backend will run on:
 👉 http://127.0.0.1:8000
 
+---
+
 🎨 Frontend Setup (React + TypeScript)
 
 Move into the frontend directory:
@@ -112,6 +114,8 @@ npm run dev
 The frontend will run on:
 👉 http://127.0.0.1:5173
 
+---
+
 📸 Screenshots
 🏠 Dashboard Page
 
@@ -126,6 +130,8 @@ Admins can add, delete, and restock sweets.
 🔐 Login Page
 
 Simple yet beautiful login interface with gradients.
+
+---
 
 ## 💡 API Endpoints Summary
 
@@ -201,6 +207,8 @@ http://127.0.0.1:8000/docs
 
 
 Or via Postman / cURL requests.
+
+---
 
 🏁 Conclusion
 
