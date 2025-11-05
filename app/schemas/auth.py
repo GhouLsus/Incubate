@@ -1,17 +1,17 @@
-from typing import Optional
+from typing import Optional, Annotated
 
-from pydantic import BaseModel, EmailStr, ConfigDict, constr
+from pydantic import BaseModel, EmailStr, ConfigDict, constr, Field
 
 
 class RegisterRequest(BaseModel):
     email: EmailStr
-    password: constr(min_length=8)
+    password: Annotated[str, Field(min_length=8, max_length=72)]
     full_name: str | None = None
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
-    password: constr(min_length=8)
+    password: Annotated[str, Field(min_length=8, max_length=72)]
 
 
 class UserRead(BaseModel):

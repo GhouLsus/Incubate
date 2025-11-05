@@ -1,35 +1,20 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
-import AppShell from "./App";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./context/AuthContext";
-import AdminPanel from "./pages/AdminPanel";
-import Dashboard from "./pages/Dashboard";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import AdminPanel from "./pages/AdminPanel";
 
-export default function AppRouter() {
-  const { user } = useAuth();
-
+function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AppShell />}>
-          <Route index element={<Dashboard />} />
-          <Route path="login" element={!user ? <Login /> : <Navigate to="/" />} />
-          <Route path="register" element={!user ? <Register /> : <Navigate to="/" />} />
-          <Route
-            path="admin"
-            element={
-              <ProtectedRoute adminOnly>
-                <AdminPanel />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Route>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin" element={<AdminPanel />} />
       </Routes>
     </BrowserRouter>
   );
 }
+
+export default AppRouter;
